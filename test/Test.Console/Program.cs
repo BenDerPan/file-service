@@ -12,6 +12,10 @@ namespace Test.Console
 {
     class Program
     {
+        const int ownerType = 1;
+        const int ownerID = 1;
+        const int timeoutSecond = 1111;
+
         static IServiceProvider Service;
 
         static async Task Main(string[] args)
@@ -22,8 +26,9 @@ namespace Test.Console
                 services.AddOptions();
                 services.AddFileService(cfg =>
                 {
-                    cfg.Host = "fs-dev.l5zx.com";
-                    cfg.AppSecret = "{F43D9A20-69DE-45D6-E298-7DACB57B9C10}";
+                    cfg.Host = "localhost:5000";
+                    //cfg.AppSecret = "{F43D9A20-69DE-45D6-E298-7DACB57B9C10}";
+                    cfg.AppSecret = "xxxxxxxxxxxxxxx";
                 });
 
                 Service = services.BuildServiceProvider();
@@ -37,6 +42,7 @@ namespace Test.Console
             {
                 System.Console.WriteLine(ex.ToString());
             }
+            System.Console.ReadKey();
         }
 
         private static async Task OnMain()
@@ -45,11 +51,11 @@ namespace Test.Console
             hcFac.CreateClient();
 
             var fsMgr = Service.GetRequiredService<IFileServiceManager>();
-            var r1 = await fsMgr.GetFileInfoAsync("1cNhV2O0uYuJK6Lr05mcEgQLAgIFNAAAAEQAAABuwzXNfiUXs6lK0MHGI1eMXJQgFbA--");
 
-            var oToken = fsMgr.GenerateOwnerTokenString(1, 1, TimeSpan.FromSeconds(1111));
-            var result = await fsMgr.GetFileInfoAsync("fasdfasdf");
-
+            var oToken = fsMgr.GenerateOwnerTokenString(ownerType, ownerID, TimeSpan.FromSeconds(1111));
+            //var setMax = await fsMgr.SetOwnerQuotaAsync(ownerType, ownerID, 1021ul * 1024 * 1024 * 50);
+            var upres =await fsMgr.UploadAsync(ownerType, ownerID, @"D:\Softs\FeiQ\FeiQ.exe");
+            var fileInfo= await fsMgr.GetFileInfoAsync(upres.Data.FileToken);
             //System.Console.WriteLine(rs.ErrorCode);
         }
     }
